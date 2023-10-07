@@ -1,6 +1,9 @@
 [package]
 name = "gnome-dbus-api"
 version = "0.1.0"
+authors = ["Julian Kominovic"]
+license = "MIT"
+description = "A simple API to interact with GNOME DBus and Gsettings"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
