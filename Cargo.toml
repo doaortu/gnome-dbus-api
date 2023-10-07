@@ -7,7 +7,7 @@ description = "A simple API to interact with GNOME DBus and Gsettings"
 edition = "2021"
 repository = "https://github.com/JulianKominovic/gnome-dbus-api"
 readme = "README.md"
-keywords = ["gnome","dbus","shell","gsettings","api","async"]
+keywords = ["gnome","dbus","shell","gsettings","api"]
 categories = ["api-bindings"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
