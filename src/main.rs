@@ -9,10 +9,10 @@ async fn main() {
     // easy_gnome::screen::set_brightness(40).await;
     // easy_gnome::screen::step_up().await;
     // easy_gnome::screen::step_down().await;
-    let apps = easy_gnome::apps::Apps::new();
+    // let apps = easy_gnome::apps::Apps::new();
     // let a = apps.get_apps();
     // for i in a {
     //     println!("{}", i.name);
     // }
-    println!("{}", apps.apps[0].get_base64_icon().unwrap());
+    // println!("{}", apps.apps[0].get_base64_icon().unwrap());
 }
