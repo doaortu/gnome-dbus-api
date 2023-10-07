@@ -1,6 +1,6 @@
 [package]
 name = "gnome-dbus-api"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Julian Kominovic"]
 license = "MIT"
 description = "A simple API to interact with GNOME DBus and Gsettings"
