@@ -291,67 +291,132 @@ pub mod easy_gnome {
 
     pub mod apps {
 
-        use std::path::PathBuf;
+        use std::io::Cursor;
 
         use gio::glib::{home_dir, GString};
         use gio::prelude::*;
-        use gio::{AppInfo, Icon};
+        use gio::AppInfo;
         use gtk::IconTheme;
         use gtk::{prelude::*, IconLookupFlags};
-        #[derive(Debug)]
+        use image::ImageOutputFormat;
+
+        // #[derive(Debug)]
         pub struct App {
-            name: GString,
-            description: Option<GString>,
-            icon: Option<Icon>,
-            path: PathBuf,
+            pub name: GString,
+            pub description: Option<GString>,
+            pub icon: Option<image::ImageBuffer<image::Rgba<u8>, Vec<u8>>>,
+            // pub launch: &'static dyn Fn() -> Result<(), Box<dyn std::error::Error>>,
         }
-        const ICON_SIZE: i32 = 128;
-        pub async fn get_all() -> Vec<AppInfo> {
-            gtk::init().unwrap();
+        impl App {
+            pub fn get_name(&self) -> &GString {
+                &self.name
+            }
+            pub fn get_description(&self) -> &Option<GString> {
+                &self.description
+            }
+            pub fn get_icon(&self) -> &Option<image::ImageBuffer<image::Rgba<u8>, Vec<u8>>> {
+                &self.icon
+            }
+            pub fn get_base64_icon(&self) -> Option<String> {
+                match &self.icon {
+                    Some(icon) => {
+                        let mut image_data: Vec<u8> = Vec::new();
+                        icon.write_to(&mut Cursor::new(&mut image_data), ImageOutputFormat::Png)
+                            .unwrap();
+                        let res_base64 = base64::encode(image_data);
+                        Some(format!("data:image/png;base64,{}", res_base64))
+                    }
+                    None => None,
+                }
+            }
+            pub fn launch(&self) -> Result<(), gio::glib::Error> {
+                // Find app by name
+                let __apps = AppInfo::all();
+                __apps
+                    .iter()
+                    .find(|app| app.name().eq_ignore_ascii_case(&self.name))
+                    .unwrap()
+                    .launch(&[], None::<&gio::AppLaunchContext>)
+            }
+        }
 
-            let apps = AppInfo::all();
-            let icon_theme: IconTheme = IconTheme::default().unwrap();
-            icon_theme.add_resource_path(
-                format!(
-                    "{}/.local/share/icons/hicolor",
-                    home_dir().to_str().unwrap()
-                )
-                .as_str(),
-            );
+        // #[derive(Debug)]
+        pub struct Apps {
+            pub apps: Vec<App>,
+        }
 
-            for app in &apps {
-                let icon = match app.icon() {
-                    Some(icon) => icon,
-                    None => continue,
-                };
-                let icon_name = gio::prelude::IconExt::to_string(&icon).unwrap();
-                // // Transform icon name to pixbuf
-
-                let pixbuf = icon_theme
-                    .load_icon(&icon_name, ICON_SIZE, IconLookupFlags::GENERIC_FALLBACK)
-                    .unwrap_or(
-                        icon_theme
-                            .load_icon("info", ICON_SIZE, IconLookupFlags::GENERIC_FALLBACK)
-                            .unwrap(),
-                    );
-
-                // Pix buf are cuadruplets of u8 (rgba)
-                let bytes: Vec<u8> = pixbuf.unwrap().read_pixel_bytes().to_vec();
-
-                // Using image library build a png based on cuadruplets (rgba)
-                let png =
-                    match image::RgbaImage::from_vec(ICON_SIZE as u32, ICON_SIZE as u32, bytes) {
-                        Some(png) => png,
-                        None => continue,
-                    };
-
-                println!("{:?}", format!("./apps-icons/{}.png", icon_name));
-                let _ = png
-                    .save(format!("./apps-icons/{}.png", icon_name))
-                    .unwrap_or(());
+        impl Apps {
+            // pub fn set_launch_callback(&self, launch: Box<dyn Fn() -> Result<(), Box<dyn Error>>>) {
+            //     self.launch = launch;
+            // }
+            pub fn get_apps(&self) -> &Vec<App> {
+                &self.apps
             }
 
-            apps
+            pub fn new() -> Apps {
+                gtk::init().unwrap();
+                const ICON_SIZE: i32 = 128;
+
+                let __apps = AppInfo::all();
+                let icon_theme: IconTheme = IconTheme::default().unwrap();
+                icon_theme.add_resource_path(
+                    format!(
+                        "{}/.local/share/icons/hicolor",
+                        home_dir().to_str().unwrap()
+                    )
+                    .as_str(),
+                );
+                let mut apps: Vec<App> = Vec::new();
+
+                for app in &__apps {
+                    let name = app.name();
+                    let description = app.description();
+                    let icon = app.icon();
+                    // let launch: &'static (dyn Fn() -> Result<(), ()> + 'static) = || {
+                    //     let launch_context = gio::AppLaunchContext::NONE;
+                    //     app.launch_uris(&[], launch_context)?;
+                    //     Ok(())
+                    // };
+
+                    if icon.is_none() {
+                        apps.push(App {
+                            name,
+                            description,
+                            icon: None,
+                            // launch: &launch,
+                        });
+                        continue;
+                    }
+                    let icon_name = gio::prelude::IconExt::to_string(&icon.unwrap()).unwrap();
+                    // // Transform icon name to pixbuf
+                    let pixbuf = icon_theme
+                        .load_icon(&icon_name, ICON_SIZE, IconLookupFlags::GENERIC_FALLBACK)
+                        .unwrap_or(
+                            icon_theme
+                                .load_icon("info", ICON_SIZE, IconLookupFlags::GENERIC_FALLBACK)
+                                .unwrap(),
+                        );
+
+                    // Pix buf are cuadruplets of u8 (rgba)
+                    let bytes: Vec<u8> = pixbuf.unwrap().read_pixel_bytes().to_vec();
+
+                    // Using image library build a png based on cuadruplets (rgba)
+                    let png: image::ImageBuffer<image::Rgba<u8>, Vec<u8>> =
+                        match image::RgbaImage::from_vec(ICON_SIZE as u32, ICON_SIZE as u32, bytes)
+                        {
+                            Some(png) => png,
+                            None => continue,
+                        };
+
+                    apps.push(App {
+                        name,
+                        description,
+                        icon: Some(png),
+                        // launch: &launch,
+                    });
+                }
+                Apps { apps }
+            }
         }
     }
 }
