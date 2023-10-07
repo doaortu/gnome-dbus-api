@@ -9,6 +9,7 @@ repository = "https://github.com/JulianKominovic/gnome-dbus-api"
 readme = "README.md"
 keywords = ["gnome","dbus","shell","gsettings","api"]
 categories = ["api-bindings"]
+links = "gdk-sys"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
