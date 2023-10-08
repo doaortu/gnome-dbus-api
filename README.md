@@ -1,6 +1,127 @@
-# Rust dbus gnome shell API
+# Rust dbus and dconf gnome api bindings
 
-A friendly API for interacting with gnome shell, freedesktop and other D-Bus services that are available on **Ubuntu**.
+[![Crates.io](https://img.shields.io/crates/v/gnome-dbus-api)](https://crates.io/crates/gnome-dbus-api)
+[![docs.rs](https://img.shields.io/docsrs/gnome-dbus-api)](https://docs.rs/gnome-dbus-api)
+[![Crates.io](https://img.shields.io/crates/d/gnome-dbus-api)]()
+[![Crates.io](https://img.shields.io/crates/l/gnome-dbus-api)]()
+
+A friendly API for interacting with gnome shell, freedesktop and other D-Bus services and settings available on **Ubuntu gnome**.
+
+This project is thought to be used in [Sittly](https://github.com/JulianKominovic/sittly-launcher) a tauri based app, you will see this trending in the examples.
+
+> **Disclaimer**: I'm not a Rust expert, I'm learning Rust and I'm using this project to learn it. If you see something that can be improved, please open an issue or a PR.
+
+## Usage
+
+### System apps
+
+This app struct is thought to be used in a GUI to display all the apps installed in the system.
+
+Because of that app.icon is a png image that can be encoded in base64 using `app.get_base64_icon()` and displayed in a GUI.
+
+```rust
+use gnome_dbus_api::handlers::easy_gnome::apps::Apps;
+
+#[derive(Serialize, Deserialize, Clone)]
+struct AppStruct {
+    name: String,
+    icon: Option<String>,
+    description: String,
+}
+
+async fn get_all_apps() -> Result<Vec<AppStruct>, String> {
+  let apps_instance = Apps::new();
+  let apps = apps_instance.get_apps();
+  let apps_struct: Vec<AppStruct> = apps
+      .iter()
+      .map(|app| {
+          let base64 = app.get_base64_icon();
+          let app_struct = AppStruct {
+              name: app.name.to_string(),
+              icon: base64,
+              description: match &app.description {
+                  Some(description) => description.to_string(),
+                  None => String::from(""),
+              },
+          };
+          app_struct
+      })
+      .collect();
+  Ok(apps_struct)
+}
+
+```
+
+### Screen
+
+```rust
+use gnome_dbus_api::handlers::easy_gnome::screen;
+
+async fn brightness_up() -> Result<(), String> {
+    screen::step_up().await;
+    Ok(())
+}
+async fn brightness_down() -> Result<(), String> {
+    screen::step_down().await;
+    Ok(())
+}
+async fn get_brightness() -> Result<i32, String> {
+    let brightness = screen::brightness().await;
+    Ok(brightness)
+}
+async fn set_brightness(value: i32) -> Result<(), String> {
+    screen::set_brightness(value).await;
+    Ok(())
+}
+```
+
+### Night light
+
+```rust
+use gnome_dbus_api::handlers::easy_gnome::nightlight;
+
+async fn get_nightlight_active() -> Result<bool, String> {
+    let is_active: bool = nightlight::nightlight_active().await;
+    Ok(is_active)
+}
+async fn get_temperature() -> Result<u32, String> {
+    let temperature: u32 = nightlight::temperature().await;
+    Ok(temperature)
+}
+async fn set_nightlight(status: bool) -> Result<(), String> {
+    nightlight::set_nightlight_active(status).await;
+    Ok(())
+}
+async fn set_temperature(temperature: u32) -> Result<(), String> {
+    nightlight::set_temperature(temperature).await;
+    Ok(())
+}
+
+```
+
+### Screenshot
+
+```rust
+use gnome_dbus_api::handlers::easy_gnome::screenshot;
+async fn pick_color() {
+  let (r, g, b) = screenshot::pick_color().await;
+}
+```
+
+### Power
+
+```rust
+use gnome_dbus_api::handlers::easy_gnome::power;
+async fn power_off() {
+power::power_off().await;
+}
+async fn reboot() {
+power::reboot().await;
+}
+async fn suspend() {
+power::suspend().await;
+}
+```
 
 ## Features
 
@@ -111,6 +232,10 @@ A friendly API for interacting with gnome shell, freedesktop and other D-Bus ser
       - [ ] brightness-step-up
       - [ ] brightness-step-down
       - [ ] brightness-toggle
+
+## Gnome shell
+
+- [Gnome shell get all apps](https://github.com/GNOME/gnome-shell/blob/main/src/shell-app-cache.c#L342)
 
 ## Devtools
 

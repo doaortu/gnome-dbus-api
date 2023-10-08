@@ -14,16 +14,6 @@ pub mod easy_gnome {
         async fn PowerOff(&self, arg: bool) -> Result<()>;
         async fn Reboot(&self, arg: bool) -> Result<()>;
     }
-    // Locales
-    // #[dbus_proxy(
-    //     interface = "org.freedesktop.locale1",
-    //     default_service = "org.freedesktop.locale1",
-    //     default_path = "/org/freedesktop/locale1"
-    // )]
-    // trait Locales {
-    //     #[dbus_proxy(property)]
-    //     fn x11_layout(&self) -> Result<String>;
-    // }
 
     // Shell extensions
     #[dbus_proxy(
@@ -149,7 +139,6 @@ pub mod easy_gnome {
         default_path = "/org/gnome/Shell/Screenshot"
     )]
     trait Screenshot {
-        // Output: ({'color': <(0.20784313725490197, 0.51764705882352946, 0.89411764705882357)>},)
         async fn PickColor(&self) -> Result<HashMap<String, zvariant::OwnedValue>>;
     }
     impl ScreenshotProxy<'static> {
@@ -192,8 +181,6 @@ pub mod easy_gnome {
 
         async fn SetTemperature(&self, temperature: u32) -> Result<()>;
     }
-
-    trait Settings {}
 
     pub mod power {
         use zbus::Connection;
