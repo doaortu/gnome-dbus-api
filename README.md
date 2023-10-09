@@ -123,6 +123,76 @@ power::suspend().await;
 }
 ```
 
+### Peripherals
+
+```rust
+use gnome_dbus_api::handlers::easy_gnome::peripherals;
+
+
+fn set_keyboard_press_delay() {
+    let delay = 100;
+    peripherals::set_keyboard_press_delay(delay).unwrap();
+    assert_eq!(peripherals::get_keyboard_press_delay().unwrap(), delay);
+}
+
+fn reset_keyboard_press_delay() {
+    let default_delay = 500;
+    peripherals::reset_keyboard_press_delay().unwrap();
+    assert_eq!(
+        peripherals::get_keyboard_press_delay().unwrap(),
+        default_delay
+    );
+}
+
+fn set_keyboard_repeat_interval() {
+    let interval = 100;
+    peripherals::set_keyboard_repeat_interval(interval).unwrap();
+    assert_eq!(
+        peripherals::get_keyboard_repeat_interval().unwrap(),
+        interval
+    );
+}
+
+fn reset_keyboard_repeat_interval() {
+    let default_interval = 30;
+    peripherals::reset_keyboard_repeat_interval().unwrap();
+    assert_eq!(
+        peripherals::get_keyboard_repeat_interval().unwrap(),
+        default_interval
+    );
+}
+
+fn set_mouse_natural_scroll() {
+    peripherals::set_mouse_natural_scroll(true).unwrap();
+    assert_eq!(peripherals::get_mouse_natural_scroll().unwrap(), true);
+}
+
+fn reset_mouse_natural_scroll() {
+    peripherals::reset_mouse_natural_scroll().unwrap();
+    assert_eq!(peripherals::get_mouse_natural_scroll().unwrap(), false);
+}
+
+fn set_touchpad_tap_to_click() {
+    peripherals::set_touchpad_tap_to_click(false).unwrap();
+    assert_eq!(peripherals::get_touchpad_tap_to_click().unwrap(), false);
+}
+
+fn reset_touchpad_tap_to_click() {
+    peripherals::reset_touchpad_tap_to_click().unwrap();
+    assert_eq!(peripherals::get_touchpad_tap_to_click().unwrap(), false);
+}
+
+fn set_two_finger_scroll() {
+    peripherals::set_two_finger_scroll(false).unwrap();
+    assert_eq!(peripherals::get_two_finger_scroll().unwrap(), false);
+}
+
+fn reset_two_finger_scroll() {
+    peripherals::reset_two_finger_scroll().unwrap();
+    assert_eq!(peripherals::get_two_finger_scroll().unwrap(), true);
+}
+```
+
 ## Features
 
 - [x] Power management
