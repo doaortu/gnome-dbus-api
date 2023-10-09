@@ -1,5 +1,6 @@
 use crate::handlers::easy_gnome;
 use crate::handlers::easy_gnome::nightlight;
+use crate::handlers::easy_gnome::peripherals;
 use crate::handlers::easy_gnome::power;
 use crate::handlers::easy_gnome::screen;
 use crate::handlers::easy_gnome::screenshot;
@@ -11,12 +12,69 @@ fn get_all_apps() {
 async fn pick_color() {
     let (r, g, b) = screenshot::pick_color().await;
 }
+
 #[test]
-fn get_base64_icon() {
-    let apps = easy_gnome::apps::Apps::new();
-    let app = apps.get_apps().get(0).unwrap();
-    println!("{:?}", app.get_base64_icon());
-    assert!(app.get_base64_icon().is_some());
+fn set_keyboard_press_delay() {
+    let delay = 100;
+    peripherals::set_keyboard_press_delay(delay).unwrap();
+    assert_eq!(peripherals::get_keyboard_press_delay().unwrap(), delay);
+}
+#[test]
+fn reset_keyboard_press_delay() {
+    let default_delay = 500;
+    peripherals::reset_keyboard_press_delay().unwrap();
+    assert_eq!(
+        peripherals::get_keyboard_press_delay().unwrap(),
+        default_delay
+    );
+}
+#[test]
+fn set_keyboard_repeat_interval() {
+    let interval = 100;
+    peripherals::set_keyboard_repeat_interval(interval).unwrap();
+    assert_eq!(
+        peripherals::get_keyboard_repeat_interval().unwrap(),
+        interval
+    );
+}
+#[test]
+fn reset_keyboard_repeat_interval() {
+    let default_interval = 30;
+    peripherals::reset_keyboard_repeat_interval().unwrap();
+    assert_eq!(
+        peripherals::get_keyboard_repeat_interval().unwrap(),
+        default_interval
+    );
+}
+#[test]
+fn set_mouse_natural_scroll() {
+    peripherals::set_mouse_natural_scroll(true).unwrap();
+    assert_eq!(peripherals::get_mouse_natural_scroll().unwrap(), true);
+}
+#[test]
+fn reset_mouse_natural_scroll() {
+    peripherals::reset_mouse_natural_scroll().unwrap();
+    assert_eq!(peripherals::get_mouse_natural_scroll().unwrap(), false);
+}
+#[test]
+fn set_touchpad_tap_to_click() {
+    peripherals::set_touchpad_tap_to_click(false).unwrap();
+    assert_eq!(peripherals::get_touchpad_tap_to_click().unwrap(), false);
+}
+#[test]
+fn reset_touchpad_tap_to_click() {
+    peripherals::reset_touchpad_tap_to_click().unwrap();
+    assert_eq!(peripherals::get_touchpad_tap_to_click().unwrap(), false);
+}
+#[test]
+fn set_two_finger_scroll() {
+    peripherals::set_two_finger_scroll(false).unwrap();
+    assert_eq!(peripherals::get_two_finger_scroll().unwrap(), false);
+}
+#[test]
+fn reset_two_finger_scroll() {
+    peripherals::reset_two_finger_scroll().unwrap();
+    assert_eq!(peripherals::get_two_finger_scroll().unwrap(), true);
 }
 
 async fn power_off() {

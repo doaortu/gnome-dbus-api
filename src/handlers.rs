@@ -406,4 +406,86 @@ pub mod easy_gnome {
             }
         }
     }
+
+    pub mod peripherals {
+        pub fn set_keyboard_press_delay(delay: u32) -> Result<(), String> {
+            crate::dconf::set(
+                "org.gnome.desktop.peripherals.keyboard",
+                "delay",
+                String::from(delay.to_string()).as_str(),
+            )
+        }
+        pub fn get_keyboard_press_delay() -> Result<u32, String> {
+            let value: String =
+                crate::dconf::get("org.gnome.desktop.peripherals.keyboard", "delay")?;
+            Ok(value.parse::<u32>().unwrap())
+        }
+        pub fn reset_keyboard_press_delay() -> Result<(), String> {
+            crate::dconf::reset("org.gnome.desktop.peripherals.keyboard", "delay")
+        }
+        pub fn set_keyboard_repeat_interval(interval: u32) -> Result<(), String> {
+            crate::dconf::set(
+                "org.gnome.desktop.peripherals.keyboard",
+                "repeat-interval",
+                String::from(interval.to_string()).as_str(),
+            )
+        }
+        pub fn get_keyboard_repeat_interval() -> Result<u32, String> {
+            let value =
+                crate::dconf::get("org.gnome.desktop.peripherals.keyboard", "repeat-interval")?;
+            Ok(value.parse::<u32>().unwrap())
+        }
+        pub fn reset_keyboard_repeat_interval() -> Result<(), String> {
+            crate::dconf::reset("org.gnome.desktop.peripherals.keyboard", "repeat-interval")
+        }
+        pub fn set_mouse_natural_scroll(enabled: bool) -> Result<(), String> {
+            crate::dconf::set(
+                "org.gnome.desktop.peripherals.mouse",
+                "natural-scroll",
+                String::from(enabled.to_string()).as_str(),
+            )
+        }
+        pub fn get_mouse_natural_scroll() -> Result<bool, String> {
+            let value = crate::dconf::get("org.gnome.desktop.peripherals.mouse", "natural-scroll")?;
+            Ok(value.parse::<bool>().unwrap())
+        }
+        pub fn reset_mouse_natural_scroll() -> Result<(), String> {
+            crate::dconf::reset("org.gnome.desktop.peripherals.mouse", "natural-scroll")
+        }
+        pub fn set_touchpad_tap_to_click(enabled: bool) -> Result<(), String> {
+            crate::dconf::set(
+                "org.gnome.desktop.peripherals.touchpad",
+                "tap-to-click",
+                String::from(enabled.to_string()).as_str(),
+            )
+        }
+        pub fn get_touchpad_tap_to_click() -> Result<bool, String> {
+            let value =
+                crate::dconf::get("org.gnome.desktop.peripherals.touchpad", "tap-to-click")?;
+            Ok(value.parse::<bool>().unwrap())
+        }
+        pub fn reset_touchpad_tap_to_click() -> Result<(), String> {
+            crate::dconf::reset("org.gnome.desktop.peripherals.touchpad", "tap-to-click")
+        }
+        pub fn set_two_finger_scroll(enabled: bool) -> Result<(), String> {
+            crate::dconf::set(
+                "org.gnome.desktop.peripherals.touchpad",
+                "two-finger-scrolling-enabled",
+                String::from(enabled.to_string()).as_str(),
+            )
+        }
+        pub fn get_two_finger_scroll() -> Result<bool, String> {
+            let value = crate::dconf::get(
+                "org.gnome.desktop.peripherals.touchpad",
+                "two-finger-scrolling-enabled",
+            )?;
+            Ok(value.parse::<bool>().unwrap())
+        }
+        pub fn reset_two_finger_scroll() -> Result<(), String> {
+            crate::dconf::reset(
+                "org.gnome.desktop.peripherals.touchpad",
+                "two-finger-scrolling-enabled",
+            )
+        }
+    }
 }
