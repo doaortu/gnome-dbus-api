@@ -1,5 +1,3 @@
-#![feature(ascii_char)]
-
 pub mod easy_gnome {
     use std::collections::HashMap;
     use zbus::{dbus_proxy, Result};
