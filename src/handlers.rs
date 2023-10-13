@@ -41,7 +41,7 @@ pub mod easy_gnome {
     /// ```
     /// https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/92d3c6e051958b31151bf9538205a71cab6f70d7/data/dbus-interfaces/org.gnome.Shell.Extensions.xml#L73
     #[derive(Debug)]
-    enum ListExtensionState {
+    pub enum ListExtensionState {
         ENABLED = 1,
         DISABLED = 2,
         ERROR = 3,
@@ -51,13 +51,13 @@ pub mod easy_gnome {
         UNINSTALLED = 99,
     }
     #[derive(Debug)]
-    struct ListExtension {
-        uuid: String,
-        name: String,
-        description: String,
-        state: ListExtensionState,
-        version: String,
-        url: String,
+    pub struct ListExtension {
+        pub uuid: String,
+        pub name: String,
+        pub description: String,
+        pub state: ListExtensionState,
+        pub version: String,
+        pub url: String,
     }
     impl ExtensionsProxy<'static> {
         async fn launch_extension_prefs(&self, uuid: &str) -> Result<()> {
@@ -402,6 +402,128 @@ pub mod easy_gnome {
                 }
                 Apps { apps }
             }
+        }
+    }
+
+    pub mod battery {
+        use upower_dbus::{DeviceProxy, UPowerProxy};
+
+        // Get devices with battery stats
+        pub async fn get_current_device_battery() -> zbus::Result<DeviceProxy<'static>> {
+            let connection = zbus::Connection::system().await?;
+            let upower = UPowerProxy::new(&connection).await?;
+            let device: DeviceProxy<'_> = upower.get_display_device().await?;
+            Ok(device)
+        }
+        pub async fn get_devices_battery() -> zbus::Result<Vec<DeviceProxy<'static>>> {
+            let connection = zbus::Connection::system().await?;
+            let upower = UPowerProxy::new(&connection).await?;
+            let devices: Vec<zvariant::OwnedObjectPath> = upower.enumerate_devices().await?;
+
+            let mut devices_battery: Vec<DeviceProxy<'_>> = Vec::new();
+            for device in devices {
+                let device_proxy = DeviceProxy::new(&connection, device).await?;
+                let is_rechargable = device_proxy.is_rechargeable().await?;
+                if is_rechargable {
+                    devices_battery.push(device_proxy);
+                }
+            }
+            Ok(devices_battery)
+        }
+    }
+
+    pub mod extensions {
+        use zbus::Connection;
+
+        use crate::handlers::easy_gnome::ExtensionsProxy;
+
+        use super::ListExtension;
+
+        pub fn set_extensions_active(active: bool) {
+            crate::dconf::set(
+                "org.gnome.shell",
+                "disable-user-extensions",
+                active.to_string().as_str(),
+            )
+            .unwrap();
+        }
+        pub fn get_extensions_active() -> bool {
+            let value = crate::dconf::get("org.gnome.shell", "disable-user-extensions").unwrap();
+            value.parse::<bool>().unwrap()
+        }
+        pub fn reset_extensions_active() {
+            crate::dconf::reset("org.gnome.shell", "disable-user-extensions").unwrap();
+        }
+        pub async fn get_extensions() -> Vec<ListExtension> {
+            let connection = Connection::session().await.unwrap();
+            let proxy = ExtensionsProxy::new(&connection).await.unwrap();
+            proxy.list_extensions().await
+        }
+        pub async fn disable_extension(uuid: &str) {
+            let connection = Connection::session().await.unwrap();
+            let proxy = ExtensionsProxy::new(&connection).await.unwrap();
+            proxy.DisableExtension(uuid.to_string()).await.unwrap();
+        }
+        pub async fn enable_extension(uuid: &str) {
+            let connection = Connection::session().await.unwrap();
+            let proxy = ExtensionsProxy::new(&connection).await.unwrap();
+            proxy.EnableExtension(uuid.to_string()).await.unwrap();
+        }
+        pub async fn uninstall_extension(uuid: &str) {
+            let connection = Connection::session().await.unwrap();
+            let proxy = ExtensionsProxy::new(&connection).await.unwrap();
+            proxy.UninstallExtension(uuid.to_string()).await.unwrap();
+        }
+        pub async fn open_extension_preferences(uuid: &str) {
+            let connection = Connection::session().await.unwrap();
+            let proxy = ExtensionsProxy::new(&connection).await.unwrap();
+            proxy.launch_extension_prefs(uuid).await.unwrap();
+        }
+    }
+
+    pub mod interface {
+        pub fn set_show_battery_percentage(show: bool) -> Result<(), String> {
+            crate::dconf::set(
+                "org.gnome.desktop.interface",
+                "show-battery-percentage",
+                show.to_string().as_str(),
+            )
+        }
+        pub fn get_show_battery_percentage() -> Result<bool, String> {
+            let value =
+                crate::dconf::get("org.gnome.desktop.interface", "show-battery-percentage")?;
+            Ok(value.parse::<bool>().unwrap())
+        }
+        pub fn reset_show_battery_percentage() -> Result<(), String> {
+            crate::dconf::reset("org.gnome.desktop.interface", "show-battery-percentage")
+        }
+        pub fn set_locate_pointer(enabled: bool) -> Result<(), String> {
+            crate::dconf::set(
+                "org.gnome.desktop.interface",
+                "locate-pointer",
+                enabled.to_string().as_str(),
+            )
+        }
+        pub fn get_locate_pointer() -> Result<bool, String> {
+            let value = crate::dconf::get("org.gnome.desktop.interface", "locate-pointer")?;
+            Ok(value.parse::<bool>().unwrap())
+        }
+        pub fn reset_locate_pointer() -> Result<(), String> {
+            crate::dconf::reset("org.gnome.desktop.interface", "locate-pointer")
+        }
+        pub fn set_cursor_size(size: u32) -> Result<(), String> {
+            crate::dconf::set(
+                "org.gnome.desktop.interface",
+                "cursor-size",
+                size.to_string().as_str(),
+            )
+        }
+        pub fn get_cursor_size() -> Result<u32, String> {
+            let value = crate::dconf::get("org.gnome.desktop.interface", "cursor-size")?;
+            Ok(value.parse::<u32>().unwrap())
+        }
+        pub fn reset_cursor_size() -> Result<(), String> {
+            crate::dconf::reset("org.gnome.desktop.interface", "cursor-size")
         }
     }
 

@@ -803,6 +803,7 @@ dependencies = [
  "gtk",
  "image",
  "tokio",
+ "upower_dbus",
  "zbus",
  "zvariant",
 ]
@@ -1735,6 +1736,17 @@ name = "unicode-ident"
 version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
+
+[[package]]
+name = "upower_dbus"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0b1d77de98ab2e5187f5fa2b045b8c4eecfc49e5ccd07f16f4c89f008116f8c"
+dependencies = [
+ "serde",
+ "serde_repr",
+ "zbus",
+]
 
 [[package]]
 name = "version-compare"

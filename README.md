@@ -193,6 +193,91 @@ fn reset_two_finger_scroll() {
 }
 ```
 
+### Battery
+
+```rust
+use gnome_dbus_api::handlers::easy_gnome::battery;
+
+async fn get_battery_display() {
+    let battery_display = battery::get_current_device_battery().await.unwrap();
+
+    let full_design_battery = battery_display.energy_full_design().await.unwrap();
+    let full_battery = battery_display.energy_full().await.unwrap();
+    let current_battery = battery_display.energy().await.unwrap();
+    let percentage = battery_display.percentage().await.unwrap();
+    let battery_state = battery_display.state().await.unwrap();
+    let temperature = battery_display.temperature().await.unwrap();
+    let is_rechargable = battery_display.is_rechargeable().await.unwrap();
+    let model = battery_display.model().await.unwrap();
+    let vendor = battery_display.vendor().await.unwrap();
+    let power_supply = battery_display.power_supply().await.unwrap();
+    let battery_type = battery_display.type_().await.unwrap();
+}
+
+async fn get_devices_battery() {
+    let battery_devices = battery::get_devices_battery().await.unwrap();
+
+    for device in battery_devices {
+        let full_design_battery = device.energy_full_design().await.unwrap();
+        let full_battery = device.energy_full().await.unwrap();
+        let current_battery = device.energy().await.unwrap();
+        let percentage = device.percentage().await.unwrap();
+        let battery_state = device.state().await.unwrap();
+        let temperature = device.temperature().await.unwrap();
+        let is_rechargable = device.is_rechargeable().await.unwrap();
+        let model = device.model().await.unwrap();
+        let vendor = device.vendor().await.unwrap();
+        let power_supply = device.power_supply().await.unwrap();
+        let battery_type = device.type_().await.unwrap();
+
+        println!(
+            "full_design_battery: {} full_battery: {} current_battery: {} percentage: {} battery_state: {:?} temperature: {} is_rechargable: {} model: {} vendor: {} power_supply: {} battery_type: {:?}",
+            full_design_battery, full_battery, current_battery, percentage, battery_state, temperature, is_rechargable, model, vendor, power_supply,battery_type
+        );
+    }
+}
+```
+
+### Gnome extensions
+
+```rust
+use gnome_dbus_api::handlers::easy_gnome::extensions;
+
+async fn get_extensions() {
+    let extensions = extensions::get_extensions().await;
+    assert!(extensions.len() > 0);
+    println!("{:?}", extensions);
+}
+
+async fn launch_extension_preferences() {
+    let _extensions_list = extensions::get_extensions().await;
+    // You can get the extension uuid from the extensions::get_extensions() function
+    let extension_uuid = "ubuntu-appindicators@ubuntu.com";
+    extensions::open_extension_preferences(extension_uuid).await
+}
+
+async fn disable_extension() {
+    let _extensions_list = extensions::get_extensions().await;
+    // You can get the extension uuid from the extensions::get_extensions() function
+    let extension_uuid = "extension-list@tu.berry";
+    extensions::disable_extension(extension_uuid).await
+}
+
+async fn enable_extension() {
+    let _extensions_list = extensions::get_extensions().await;
+    // You can get the extension uuid from the extensions::get_extensions() function
+    let extension_uuid = "extension-list@tu.berry";
+    extensions::enable_extension(extension_uuid).await
+}
+
+async fn uninstall_extension() {
+    let _extensions_list = extensions::get_extensions().await;
+    // You can get the extension uuid from the extensions::get_extensions() function
+    let extension_uuid = "extension-list@tu.berry";
+    extensions::uninstall_extension(extension_uuid).await
+}
+```
+
 ## Features
 
 - [x] Power management
@@ -223,7 +308,20 @@ fn reset_two_finger_scroll() {
   - [x] org.gnome.desktop.peripherals.mouse natural-scroll true
   - [x] org.gnome.desktop.peripherals.keyboard repeat-interval 30 (initial key repeat delay)
   - [x] org.gnome.desktop.peripherals.keyboard delay 500 (initial key repeat delay)
-  - [ ] org.gnome.shell disable-user-extensions false
+  - [x] org.gnome.desktop.interface show-battery-percentage true
+  <!-- - [ ] org.gnome.desktop.interface overlay-scrolling true -->
+  - [x] org.gnome.desktop.interface locate-pointer false (with ctrl key)
+  <!-- - [ ] org.gnome.desktop.interface enable-hot-corners false -->
+  - [x] org.gnome.desktop.interface cursor-size 24
+      <!-- - [ ] org.gnome.desktop.interface cursor-blink-timeout 10 -->
+      <!-- - [ ] org.gnome.desktop.interface cursor-blink-time 1200 -->
+      <!-- - [ ] org.gnome.desktop.interface cursor-blink true -->
+    <!-- - [ ] org.gnome.desktop.interface color-scheme 'prefer-light' -->
+    <!-- - [ ] org.gnome.desktop.interface clock-show-weekday true
+  - [ ] org.gnome.desktop.interface clock-show-seconds false
+  - [ ] org.gnome.desktop.interface clock-show-date true
+  - [ ] org.gnome.desktop.interface clock-format -->
+  - [x] org.gnome.shell disable-user-extensions false
   - [ ] org.gnome.shell development-tools true
   - [ ] org.gnome.mutter center-new-windows
   - [ ] org.gnome.gnome-session auto-save-session false (restore open apps on login)
@@ -232,19 +330,6 @@ fn reset_two_finger_scroll() {
   - [ ] org.gnome.desktop.privacy disable-sound-output false
   - [ ] org.gnome.desktop.privacy disable-microphone false
   - [ ] org.gnome.desktop.privacy disable-camera false
-  - [ ] org.gnome.desktop.interface show-battery-percentage true
-  - [ ] org.gnome.desktop.interface overlay-scrolling true
-  - [ ] org.gnome.desktop.interface locate-pointer false (with ctrl key)
-  - [ ] org.gnome.desktop.interface enable-hot-corners false
-  - [ ] org.gnome.desktop.interface cursor-size 24
-  - [ ] org.gnome.desktop.interface cursor-blink-timeout 10
-  - [ ] org.gnome.desktop.interface cursor-blink-time 1200
-  - [ ] org.gnome.desktop.interface cursor-blink true
-  - [ ] org.gnome.desktop.interface color-scheme 'prefer-light'
-  - [ ] org.gnome.desktop.interface clock-show-weekday true
-  - [ ] org.gnome.desktop.interface clock-show-seconds false
-  - [ ] org.gnome.desktop.interface clock-show-date true
-  - [ ] org.gnome.desktop.interface clock-format
   - [ ] org.gnome.desktop.calendar show-weekdate
   - [ ] org.gnome.desktop.background show-desktop-icons true
   - [ ] org.gnome.desktop.background picture-uri-dark 'file:///home/julian/Pictures/Wallpapers/image.webp'
@@ -262,29 +347,26 @@ fn reset_two_finger_scroll() {
   - [ ] is_lid_closed
   - [ ] enumerate_devices
   - [ ] get_display_device
-  - [ ] device, battery, external_device
-    - [ ] type (important to identify external devices) (https://upower.freedesktop.org/docs/Device.html)
-    - [ ] state (https://upower.freedesktop.org/docs/Device.html)
-    - [ ] technology (https://upower.freedesktop.org/docs/Device.html)
-    - [ ] get_percentage
-    - [ ] time_to_empty (seconds) (0 if unknown)
-    - [ ] time_to_full (seconds) (0 if unknown)
-    - [ ] capacity (battery life)
-    - [ ] energy_full (Wh) (actual max charge)
-    - [ ] energy_full_design (Wh) (factory max charge)
-    - [ ] energy_rate (W) (current power draw)
-    - [ ] temperature (K)
-    - [ ] model
-    - [ ] vendor
-    - [ ] voltage
+  - [x] device, battery, external_device
+    - [x] type (important to identify external devices) (https://upower.freedesktop.org/docs/Device.html)
+    - [x] state (https://upower.freedesktop.org/docs/Device.html)
+    - [x] technology (https://upower.freedesktop.org/docs/Device.html)
+    - [x] get_percentage
+    - [x] time_to_empty (seconds) (0 if unknown)
+    - [x] time_to_full (seconds) (0 if unknown)
+    - [x] capacity (battery life)
+    - [x] energy_full (Wh) (actual max charge)
+    - [x] energy_full_design (Wh) (factory max charge)
+    - [x] energy_rate (W) (current power draw)
+    - [x] temperature (K)
+    - [x] model
+    - [x] vendor
+    - [x] voltage
 - [ ] net.hadess.PowerProfiles: power profiles (power save, balanced, performance)
+
   - [ ] active_profile (read/write)
   - [ ] PerformanceInhibited (read) (reason for performance being inhibited)
   - [ ] PerformanceDegraded (read) (reason for performance being degraded)
-- [ ] org.a11y.Bus: accessibility bus
-
-  - [ ] isEnabled (read/write)
-  - [ ] screenReaderEnabled (read/write)
 
 - org.bluez: bluetooth devices, devices stats
 - org.freedesktop.NetworkManager: network manager, wifi, connections
