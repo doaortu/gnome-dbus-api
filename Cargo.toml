@@ -1,11 +1,27 @@
 [package]
 name = "gnome-dbus-api"
-version = "0.1.0"
+version = "1.0.0"
+authors = ["Julian Kominovic"]
+license = "MIT"
+description = "A simple API to interact with GNOME DBus and Gsettings"
 edition = "2021"
+repository = "https://github.com/JulianKominovic/gnome-dbus-api"
+readme = "README.md"
+keywords = ["gnome","dbus","shell","gsettings","api"]
+categories = ["api-bindings"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+
+[dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-zbus = "3.14.1"
-zvariant = "3.15.0"
+
+[dependencies]
+base64 = "^0.21.4"
+gdk = "^0.15.0"
+gio = "^0.15.0"
+gtk = "^0.15.0"
+image = "^0.24.7"
+upower_dbus = "0.3.2"
+zbus = "^3.14.1"
+zvariant = "^3.15.0"
