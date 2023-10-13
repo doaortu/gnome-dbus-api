@@ -16,6 +16,13 @@ async fn pick_color() {
     let (r, g, b) = screenshot::pick_color().await;
 }
 #[tokio::test]
+async fn set_power_profile() {
+    let power_profile = easy_gnome::PowerProfile::PowerSaver;
+    power::set_power_profile(power_profile).await;
+    assert_eq!(power::get_power_profile().await, power_profile);
+}
+
+#[tokio::test]
 async fn get_extensions() {
     let extensions = extensions::get_extensions().await;
     assert!(extensions.len() > 0);

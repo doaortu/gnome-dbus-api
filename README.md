@@ -362,9 +362,9 @@ async fn uninstall_extension() {
     - [x] model
     - [x] vendor
     - [x] voltage
-- [ ] net.hadess.PowerProfiles: power profiles (power save, balanced, performance)
+- [x] net.hadess.PowerProfiles: power profiles (power save, balanced, performance)
 
-  - [ ] active_profile (read/write)
+  - [x] active_profile (read/write)
   - [ ] PerformanceInhibited (read) (reason for performance being inhibited)
   - [ ] PerformanceDegraded (read) (reason for performance being degraded)
 
@@ -375,11 +375,6 @@ async fn uninstall_extension() {
 - org.gnome.SettingsDaemon.\*: settings daemon
   - [ ] org.gnome.SettingsDaemon.Power:
     - [ ] keyboard
-      - [ ] brightness (r/w)
-      - [ ] brightness-step-up
-      - [ ] brightness-step-down
-      - [ ] brightness-toggle
-    - [ ] screen
       - [ ] brightness (r/w)
       - [ ] brightness-step-up
       - [ ] brightness-step-down

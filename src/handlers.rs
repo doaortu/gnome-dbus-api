@@ -13,6 +13,42 @@ pub mod easy_gnome {
         async fn Reboot(&self, arg: bool) -> Result<()>;
     }
 
+    #[derive(PartialEq, Debug, Clone, Copy)]
+    pub enum PowerProfile {
+        PowerSaver,
+        Balanced,
+        Performance,
+    }
+
+    impl PowerProfile {
+        fn as_str(&self) -> &'static str {
+            match self {
+                PowerProfile::PowerSaver => "power-saver",
+                PowerProfile::Balanced => "balanced",
+                PowerProfile::Performance => "performance",
+            }
+        }
+        fn from(profile: &str) -> PowerProfile {
+            match profile {
+                "power-saver" => PowerProfile::PowerSaver,
+                "balanced" => PowerProfile::Balanced,
+                "performance" => PowerProfile::Performance,
+                _ => PowerProfile::Balanced,
+            }
+        }
+    }
+    #[dbus_proxy(
+        interface = "net.hadess.PowerProfiles",
+        default_service = "net.hadess.PowerProfiles",
+        default_path = "/net/hadess/PowerProfiles"
+    )]
+    trait PowerProfiles {
+        #[dbus_proxy(property)]
+        fn ActiveProfile(&self) -> Result<String>;
+        #[dbus_proxy(property)]
+        fn set_ActiveProfile(&self, profile: String) -> Result<()>;
+    }
+
     // Shell extensions
     #[dbus_proxy(
         interface = "org.gnome.Shell.Extensions",
@@ -185,6 +221,8 @@ pub mod easy_gnome {
 
         use crate::handlers::easy_gnome::PowerManagementProxy;
 
+        use super::{PowerProfile, PowerProfilesProxy};
+
         pub async fn power_off() {
             let connection = Connection::system().await.unwrap();
             let proxy = PowerManagementProxy::new(&connection).await.unwrap();
@@ -199,6 +237,19 @@ pub mod easy_gnome {
             let connection = Connection::system().await.unwrap();
             let proxy = PowerManagementProxy::new(&connection).await.unwrap();
             proxy.Reboot(true).await.unwrap();
+        }
+        pub async fn get_power_profile() -> PowerProfile {
+            let connection = Connection::system().await.unwrap();
+            let proxy = PowerProfilesProxy::new(&connection).await.unwrap();
+            PowerProfile::from(proxy.ActiveProfile().await.unwrap().as_str())
+        }
+        pub async fn set_power_profile(profile: PowerProfile) {
+            let connection = Connection::system().await.unwrap();
+            let proxy = PowerProfilesProxy::new(&connection).await.unwrap();
+            proxy
+                .set_ActiveProfile(profile.as_str().to_string())
+                .await
+                .unwrap();
         }
     }
 
