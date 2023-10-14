@@ -323,6 +323,7 @@ pub mod easy_gnome {
     pub mod apps {
 
         use std::io::Cursor;
+        use std::path::PathBuf;
 
         use gio::glib::{home_dir, GString};
         use gio::prelude::*;
@@ -335,6 +336,7 @@ pub mod easy_gnome {
             pub name: GString,
             pub description: Option<GString>,
             pub icon: Option<image::ImageBuffer<image::Rgba<u8>, Vec<u8>>>,
+            pub executable: PathBuf,
         }
         impl App {
             pub fn get_name(&self) -> &GString {
@@ -399,13 +401,14 @@ pub mod easy_gnome {
                     let name = app.name();
                     let description = app.description();
                     let icon = app.icon();
+                    let executable = app.executable();
 
                     if icon.is_none() {
                         apps.push(App {
                             name,
                             description,
                             icon: None,
-                            // launch: &launch,
+                            executable,
                         });
                         continue;
                     }
@@ -434,6 +437,7 @@ pub mod easy_gnome {
                         name,
                         description,
                         icon: Some(png),
+                        executable,
                     });
                 }
                 Apps { apps }
