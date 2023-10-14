@@ -331,12 +331,10 @@ pub mod easy_gnome {
         use gtk::{prelude::*, IconLookupFlags};
         use image::ImageOutputFormat;
 
-        // #[derive(Debug)]
         pub struct App {
             pub name: GString,
             pub description: Option<GString>,
             pub icon: Option<image::ImageBuffer<image::Rgba<u8>, Vec<u8>>>,
-            // pub launch: &'static dyn Fn() -> Result<(), Box<dyn std::error::Error>>,
         }
         impl App {
             pub fn get_name(&self) -> &GString {
@@ -371,15 +369,11 @@ pub mod easy_gnome {
             }
         }
 
-        // #[derive(Debug)]
         pub struct Apps {
             pub apps: Vec<App>,
         }
 
         impl Apps {
-            // pub fn set_launch_callback(&self, launch: Box<dyn Fn() -> Result<(), Box<dyn Error>>>) {
-            //     self.launch = launch;
-            // }
             pub fn get_apps(&self) -> &Vec<App> {
                 &self.apps
             }
@@ -399,14 +393,12 @@ pub mod easy_gnome {
                 let mut apps: Vec<App> = Vec::new();
 
                 for app in &__apps {
+                    if !app.should_show() {
+                        continue;
+                    }
                     let name = app.name();
                     let description = app.description();
                     let icon = app.icon();
-                    // let launch: &'static (dyn Fn() -> Result<(), ()> + 'static) = || {
-                    //     let launch_context = gio::AppLaunchContext::NONE;
-                    //     app.launch_uris(&[], launch_context)?;
-                    //     Ok(())
-                    // };
 
                     if icon.is_none() {
                         apps.push(App {
@@ -442,7 +434,6 @@ pub mod easy_gnome {
                         name,
                         description,
                         icon: Some(png),
-                        // launch: &launch,
                     });
                 }
                 Apps { apps }

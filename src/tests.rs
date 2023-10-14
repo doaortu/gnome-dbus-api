@@ -7,11 +7,11 @@ use crate::handlers::easy_gnome::peripherals;
 use crate::handlers::easy_gnome::power;
 use crate::handlers::easy_gnome::screen;
 use crate::handlers::easy_gnome::screenshot;
-use std::thread;
 #[test]
 fn get_all_apps() {
     gtk::init().unwrap();
     let apps = easy_gnome::apps::Apps::new();
+    println!("{:?}", apps.get_apps().len());
     assert!(apps.get_apps().len() > 0);
 }
 async fn pick_color() {
