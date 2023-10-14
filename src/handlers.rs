@@ -385,7 +385,6 @@ pub mod easy_gnome {
             }
 
             pub fn new() -> Apps {
-                gtk::init().unwrap();
                 const ICON_SIZE: i32 = 128;
 
                 let __apps = AppInfo::all();

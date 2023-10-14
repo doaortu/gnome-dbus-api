@@ -28,6 +28,9 @@ struct AppStruct {
     icon: Option<String>,
     description: String,
 }
+// Init gtk global instance to use gtk related functions
+// If you already have a gtk instance running you must skip this step
+gtk::init().unwrap();
 
 async fn get_all_apps() -> Result<Vec<AppStruct>, String> {
   let apps_instance = Apps::new();
