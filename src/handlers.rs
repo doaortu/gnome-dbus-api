@@ -199,23 +199,6 @@ pub mod easy_gnome {
         fn StepDown(&self) -> Result<()>;
     }
 
-    // Settings color (night light)
-    #[dbus_proxy(
-        interface = "org.gnome.SettingsDaemon.Color",
-        default_service = "org.gnome.SettingsDaemon.Color",
-        default_path = "/org/gnome/SettingsDaemon/Color"
-    )]
-    trait Nightlight {
-        #[dbus_proxy(property)]
-        fn set_NightLightActive(&self, active: bool) -> Result<()>;
-        #[dbus_proxy(property)]
-        fn NightLightActive(&self) -> Result<bool>;
-        #[dbus_proxy(property)]
-        fn Temperature(&self) -> Result<u32>;
-
-        async fn SetTemperature(&self, temperature: u32) -> Result<()>;
-    }
-
     pub mod power {
         use zbus::Connection;
 
@@ -293,35 +276,47 @@ pub mod easy_gnome {
     }
 
     pub mod nightlight {
-        use std::process::Command;
 
-        use zbus::Connection;
-
-        use crate::handlers::easy_gnome::NightlightProxy;
-
-        pub async fn nightlight_active() -> bool {
-            let connection = Connection::session().await.unwrap();
-            let proxy = NightlightProxy::new(&connection).await.unwrap();
-            proxy.NightLightActive().await.unwrap()
+        pub fn get_nightlight_active() -> bool {
+            crate::dconf::get(
+                "org.gnome.settings-daemon.plugins.color",
+                "night-light-enabled",
+            )
+            .unwrap()
+            .parse::<bool>()
+            .unwrap()
         }
-        pub async fn set_nightlight_active(active: bool) {
-            Command::new("gsettings")
-                .arg("set")
-                .arg("org.gnome.settings-daemon.plugins.color")
-                .arg("night-light-enabled")
-                .arg(active.to_string())
-                .spawn()
-                .expect("failed to execute process");
+        pub fn set_nightlight_active(active: bool) {
+            crate::dconf::set(
+                "org.gnome.settings-daemon.plugins.color",
+                "night-light-enabled",
+                active.to_string().as_str(),
+            )
+            .unwrap();
         }
-        pub async fn temperature() -> u32 {
-            let connection = Connection::session().await.unwrap();
-            let proxy = NightlightProxy::new(&connection).await.unwrap();
-            proxy.Temperature().await.unwrap()
+        pub fn get_temperature() -> u32 {
+            crate::dconf::get(
+                "org.gnome.settings-daemon.plugins.color",
+                "night-light-temperature",
+            )
+            .unwrap()
+            .parse::<u32>()
+            .unwrap()
         }
-        pub async fn set_temperature(temperature: u32) {
-            let connection = Connection::session().await.unwrap();
-            let proxy = NightlightProxy::new(&connection).await.unwrap();
-            proxy.SetTemperature(temperature).await.unwrap();
+        pub fn reset_temperature() {
+            crate::dconf::reset(
+                "org.gnome.settings-daemon.plugins.color",
+                "night-light-temperature",
+            )
+            .unwrap();
+        }
+        pub fn set_temperature(temperature: u32) {
+            crate::dconf::set(
+                "org.gnome.settings-daemon.plugins.color",
+                "night-light-temperature",
+                temperature.to_string().as_str(),
+            )
+            .unwrap();
         }
     }
 

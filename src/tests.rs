@@ -218,21 +218,36 @@ async fn suspend() {
     power::suspend().await;
 }
 
-async fn get_nightlight_active() -> Result<bool, String> {
-    let is_active: bool = nightlight::nightlight_active().await;
-    Ok(is_active)
+#[test]
+fn get_temperature() {
+    let temperature: u32 = nightlight::get_temperature();
+    println!("temperature: {}", temperature);
+    assert!(temperature > 0);
 }
-async fn get_temperature() -> Result<u32, String> {
-    let temperature: u32 = nightlight::temperature().await;
-    Ok(temperature)
+#[test]
+fn set_temperature() {
+    let temperature: u32 = 3000;
+    nightlight::set_temperature(temperature);
+    assert_eq!(nightlight::get_temperature(), temperature);
 }
-async fn set_nightlight(status: bool) -> Result<(), String> {
-    nightlight::set_nightlight_active(status).await;
-    Ok(())
+#[test]
+
+fn reset_temperature() {
+    let temperature: u32 = 2700;
+    nightlight::reset_temperature();
+    assert_eq!(nightlight::get_temperature(), temperature);
 }
-async fn set_temperature(temperature: u32) -> Result<(), String> {
-    nightlight::set_temperature(temperature).await;
-    Ok(())
+#[test]
+fn set_nightlight_active() {
+    let active = true;
+    nightlight::set_nightlight_active(active);
+    assert_eq!(nightlight::get_nightlight_active(), active);
+}
+#[test]
+fn get_nightlight_active() {
+    let active = false;
+    nightlight::set_nightlight_active(active);
+    assert_eq!(nightlight::get_nightlight_active(), active);
 }
 
 async fn brightness_up() -> Result<(), String> {
